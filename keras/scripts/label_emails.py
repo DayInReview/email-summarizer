@@ -5,10 +5,10 @@ import email
 from email.header import decode_header
 
 
-def write_to_csv(filepath, body, class_):
+def write_to_csv(filepath, message_id, body, class_):
     with open(filepath, 'a') as csvfile:
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow([body, class_])
+        csvwriter.writerow([message_id, body, class_])
 
 
 def get_email(imap, idx):
@@ -16,7 +16,7 @@ def get_email(imap, idx):
     for response in message:
         if isinstance(response, tuple):
             msg = email.message_from_bytes(response[1])
-            subject = decode_header(msg["Subject"])[0][0]
+            message_id = decode_header(msg["Message-ID"])[0][0]
 
             if msg.is_multipart():
                 for part in msg.walk():
@@ -27,12 +27,12 @@ def get_email(imap, idx):
                     except:
                         pass
                     if content_type == 'text/plain':
-                        return body
+                        return body, message_id
             else:
                 content_type = msg.get_content_type()
                 body = msg.get_payload(decode=True).decode()
                 if content_type == 'text/plain':
-                    return body
+                    return body, message_id
 
 
 def login(email, password):
@@ -44,6 +44,19 @@ def login(email, password):
 def logout(imap):
     imap.close()
     imap.logout()
+
+
+def check_unique(message_id, filepath):
+    emails = list()
+    with open(filepath, 'r') as csvfile:
+        csvreader = csv.reader(csvfile)
+        for row in csvreader:
+            emails.append(row)
+    id_list = [email[0] for email in emails]
+    if message_id in id_list:
+        return False
+    else:
+        return True
 
 
 def main():
@@ -85,12 +98,16 @@ def main():
     num_messages = int(messages[0])
 
     for i in range(num_messages, 0, -1):
-        print('==================================================')
-        body = get_email(imap, i)
-        print(body)
-        print(classes)
-        class_ = int(input('What is the classification? '))
-        write_to_csv(args.filepath, body, class_)
+        body, message_id = get_email(imap, i)
+        if check_unique(message_id, args.filepath):
+            print('==================================================')
+            print(body)
+            print(classes)
+            class_ = int(input('What is the classification? '))
+            while class_ not in classes.values():
+                print('Invalid class')
+                class_ = int(input('What is the classification? '))
+            write_to_csv(args.filepath, message_id, body, class_)
 
     # Logout of email
     logout(imap)
@@ -98,3 +115,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # check_unique('test', 'keras/data/labeled_emails.csv')
