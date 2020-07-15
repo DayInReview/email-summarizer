@@ -61,7 +61,7 @@ def check_unique(message_id, filepath):
 
 def main():
     # Sets up parser
-    parser = argparse.ArgumentParser(description='Classify emails for model training. Outputs a csv file formatted: [<message body>, <class>]')
+    parser = argparse.ArgumentParser(description='Classify emails for model training. Outputs a csv file formatted: [<message id>, <message body>, <class>]')
     parser.add_argument(
         '-e', '--email',
         dest='email',
@@ -99,15 +99,19 @@ def main():
 
     for i in range(num_messages, 0, -1):
         body, message_id = get_email(imap, i)
-        if check_unique(message_id, args.filepath):
+        if check_unique(message_id, args.filepath) and body.rstrip() != '':
             print('==================================================')
             print(body)
+            print()
             print(classes)
             class_ = int(input('What is the classification? '))
-            while class_ not in classes.values():
+            while class_ not in classes.keys():
                 print('Invalid class')
                 class_ = int(input('What is the classification? '))
             write_to_csv(args.filepath, message_id, body, class_)
+            response = input('Continue? (y/n) ')
+            if response != 'y':
+                break
 
     # Logout of email
     logout(imap)
@@ -115,4 +119,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # check_unique('test', 'keras/data/labeled_emails.csv')
