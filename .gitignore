@@ -3,4 +3,5 @@ credentials.json
 *.pyc
 .vscode
 env
+*.csv
 tempCodeRunnerFile.py
