@@ -3,7 +3,8 @@ import os
 import argparse
 import imaplib
 import email
-import html2text
+import re
+from bs4 import BeautifulSoup
 from email.header import decode_header
 
 
@@ -11,6 +12,15 @@ def check_file_exists(filepath):
     if not os.path.exists(filepath):
         with open(filepath, 'w') as _:
             pass
+
+def remove_newlines(txt):
+    txt = re.sub(r'[\r\n]+', '\n', txt)
+    txt = re.sub(r'[\n\r]+', '\n', txt)
+    txt = re.sub(r' +', ' ', txt)
+    txt = re.sub(r'\n +', '\n', txt)
+    txt = re.sub(r'\n+', '\n', txt)
+    return txt
+
 
 
 def write_to_csv(filepath, message_id, body, class_):
@@ -35,14 +45,27 @@ def get_email(imap, idx):
                     except:
                         pass
                     if content_type == 'text/plain':
-                        return body, message_id
+                        remove_links = re.sub(r'http\S+', '', body)
+                        return remove_newlines(remove_links), message_id
+                    elif content_type == 'text/html':
+                        soup = BeautifulSoup(body, features="html.parser")
+                        for a in soup.findAll('a'):
+                            a.replaceWithChildren()
+                        return remove_newlines(soup.get_text('\n')), message_id
             else:
                 content_type = msg.get_content_type()
-                body = msg.get_payload(decode=True).decode()
+                try:
+                    body = msg.get_payload(decode=True).decode()
+                except:
+                    return None, None
                 if content_type == 'text/plain':
-                    return body, message_id
+                    remove_links = re.sub(r'http\S+', '', body)
+                    return remove_newlines(remove_links), message_id
                 elif content_type == 'text/html':
-                    return html2text.html2text(body), message_id
+                    soup = BeautifulSoup(body, features="html.parser")
+                    for a in soup.findAll('a'):
+                        a.replaceWithChildren()
+                    return remove_newlines(soup.get_text('\n')), message_id
 
 
 def login(email, password):
@@ -111,6 +134,8 @@ def main():
 
     for i in range(num_messages, 0, -1):
         body, message_id = get_email(imap, i)
+        if body is None:
+            continue
         if check_unique(message_id, args.filepath) and body.rstrip() != '':
             print('==================================================')
             print(body)
