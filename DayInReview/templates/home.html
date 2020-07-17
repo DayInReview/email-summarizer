@@ -17,17 +17,19 @@
 		<div class="row">
 			<div class="col-md-4 offset-md-4">
 				<form class="needs-validation" novalidate="" name="info" method="POST" action="/display">
+					{{ form.hidden_tag() }}
+
 					<div class="mb-3">
-						<label for="email">Email</label>
-						<input type="email" class="form-control" id="email" placeholder="you@example.com">
+						{{ form.email.label(class="form-control-label") }}
+						{{ form.email(class="form-control form-control-md", placeholder="you@example.com") }}
 					</div>
 
 					<div class="mb-3">
-						<label for="email">Password</label>
-						<input type="password" class="form-control" id="password" placeholder="not password">
+						{{ form.password.label(class="form-control-label") }}
+						{{ form.password(class="form-control form-control-md", input="password", placeholder="password") }}
 					</div>
 
-					<button class="btn btn-primary btn-lg btn-block" id="submit">Submit</button>
+					{{ form.submit(class="btn btn-outline-primary btn-lg btn-block") }}
 				</form>
 			</div>
 		</div>
