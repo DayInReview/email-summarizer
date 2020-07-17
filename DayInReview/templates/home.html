@@ -1,0 +1,37 @@
+{% extends "outline.html" %}
+
+{% block head %}
+<head>
+</head>
+{% endblock head %}
+
+{% block body %}
+<body class="bg-light">
+	<div class="container">
+		<div class="py-5 text-center">
+			<h1>Day in Review</h2>
+			<p class="lead">Enter email password get emails yay</p>
+		</div>
+
+		<!-- form -->
+		<div class="row">
+			<div class="col-md-4 offset-md-4">
+				<form class="needs-validation" novalidate="">
+					<div class="mb-3">
+						<label for="email">Email</label>
+						<input type="email" class="form-control" id="email" placeholder="you@example.com">
+					</div>
+
+					<div class="mb-3">
+						<label for="email">Password</label>
+						<input type="password" class="form-control" id="email" placeholder="not password">
+					</div>
+
+					<button class="btn btn-primary btn-lg btn-block" type="submit">Submit</button>
+				</form>
+			</div>
+		</div>
+
+	</div>
+</body>
+{% endblock body %}
