@@ -1,8 +1,16 @@
 import csv
+import os
 import argparse
 import imaplib
 import email
+import html2text
 from email.header import decode_header
+
+
+def check_file_exists(filepath):
+    if not os.path.exists(filepath):
+        with open(filepath, 'w') as _:
+            pass
 
 
 def write_to_csv(filepath, message_id, body, class_):
@@ -33,6 +41,8 @@ def get_email(imap, idx):
                 body = msg.get_payload(decode=True).decode()
                 if content_type == 'text/plain':
                     return body, message_id
+                elif content_type == 'text/html':
+                    return html2text.html2text(body), message_id
 
 
 def login(email, password):
@@ -96,6 +106,8 @@ def main():
     # Loop through emails
     status, messages = imap.select("INBOX")
     num_messages = int(messages[0])
+
+    check_file_exists(args.filepath)
 
     for i in range(num_messages, 0, -1):
         body, message_id = get_email(imap, i)
