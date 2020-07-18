@@ -4,14 +4,12 @@ from email.header import decode_header
 import webbrowser
 import os
 
-
-def main(username, password, N):
+def read_emails(username, password, N):
     # Create IMAP4 class with SSL
     imap = imaplib.IMAP4_SSL("imap.gmail.com")
 
     # Authenticate
     imap.login(username, password)
-
 
     status, messages = imap.select("INBOX")
     num_messages = int(messages[0])
@@ -48,9 +46,8 @@ def main(username, password, N):
     imap.close()
     imap.logout()
 
-
 if __name__ == '__main__':
     username = input("Enter email: ")
     password = input("Enter password: ")
     N = int(input("How many emails? "))
-    main(username, password, N)
+    read_emails(username, password, N)
