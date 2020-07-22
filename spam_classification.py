@@ -8,6 +8,7 @@ import joblib
 from bs4 import BeautifulSoup
 from email.header import decode_header
 from collections import Counter
+from extractive_summarizer import load_model as load_summary_model, get_summary
 
 
 def get_word_list():
@@ -119,7 +120,7 @@ def main():
         body, message_id = get_email(imap, i)
         if body is None:
             continue
-        body = re.sub('[^A-Za-z \t\n]', '', body)
+        body = re.sub('[^A-Za-z \t\n,.]', '', body)
         word_counts = get_word_counts(body)
         
         # Add to email_matrix
@@ -138,6 +139,8 @@ def main():
             print('SPAM')
         else:
             print('NOT SPAM')
+            print('Summary: ')
+            print(get_summary(body))
 
         response = input('Continue? (y/n) ')
         if response != 'y':
@@ -149,4 +152,5 @@ def main():
 
 
 if __name__ == '__main__':
+    load_summary_model()
     main()

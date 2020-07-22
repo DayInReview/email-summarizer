@@ -4,5 +4,6 @@ credentials.json
 .vscode
 env
 *.csv
+keras/models/extractive_summarizer.joblib
 tempCodeRunnerFile.py
 .ipynb_checkpoints/
