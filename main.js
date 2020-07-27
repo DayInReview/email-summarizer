@@ -1,7 +1,6 @@
 const { app, BrowserWindow, Menu } = require('electron')
 const path = require('path')
-const isMac = process.platform === 'darwin'
-
+const isMac = process.platform === 'darwin';
 const template = [
 
     // { role: 'appMenu' }
@@ -27,10 +26,10 @@ const template = [
             { role: 'forcereload' },
             { role: 'toggledevtools' },
             {
-                label: 'Launch Website',
+                label: 'GitHub Repository',
                 click: async () => {
                   const { shell } = require('electron')
-                  await shell.openExternal('http://localhost:5000/')
+                  await shell.openExternal('https://github.com/ishan0102/day-in-review')
                 }
             }
         ]
@@ -116,12 +115,10 @@ const template = [
     }
   ]
 
+// Create browser window
 function createWindow () {
-    // Create browser window
-
+    process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
     let win = new BrowserWindow({
-        // width: 1000,
-
         // Larger for DevTools
         width: 1700,
         height: 800,
@@ -130,7 +127,7 @@ function createWindow () {
         }
     });
 
-    win.loadFile(path.join(__dirname, 'DayInReview/templates/home.html'));
+    win.loadFile(path.join(__dirname, 'DayInReview/templates/login.html'));
 
     // Build Menu
     const mainMenu = Menu.buildFromTemplate(template);
