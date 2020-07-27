@@ -1,0 +1,23 @@
+{
+  "name": "day-in-review",
+  "version": "1.0.0",
+  "description": "Email summarization desktop app using convolutional neural networks and abstraction techniques",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ishan0102/day-in-review.git"
+  },
+  "author": "Ishan Shah",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ishan0102/day-in-review/issues"
+  },
+  "homepage": "https://github.com/ishan0102/day-in-review#readme",
+  "dependencies": {
+    "electron": "^9.1.1"
+  }
+}

@@ -1,8 +1,8 @@
-credentials.json
-*.pickle
 *.pyc
 .vscode
 env
 *.csv
 tempCodeRunnerFile.py
 .ipynb_checkpoints/
+.DS_Store
+node_modules
