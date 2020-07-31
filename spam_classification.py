@@ -3,11 +3,13 @@ import os
 import argparse
 import imaplib
 import email
+import email.utils
 import re
 import joblib
 from bs4 import BeautifulSoup
 from email.header import decode_header
 from collections import Counter
+from datetime import datetime
 from extractive_summarizer import load_model as load_summary_model, get_summary
 
 
@@ -40,7 +42,10 @@ def get_email(imap, idx):
     for response in message:
         if isinstance(response, tuple):
             msg = email.message_from_bytes(response[1])
-            message_id = decode_header(msg["Message-ID"])[0][0]
+            from_ = msg["From"]
+            subject = msg["Subject"]
+            date = email.utils.parsedate_to_datetime(msg["Date"])
+            details = (from_, subject, date)
 
             if msg.is_multipart():
                 for part in msg.walk():
@@ -52,12 +57,12 @@ def get_email(imap, idx):
                         pass
                     if content_type == 'text/plain':
                         remove_links = re.sub(r'http\S+', '', body)
-                        return remove_newlines(remove_links), message_id
+                        return remove_newlines(remove_links), details
                     elif content_type == 'text/html':
                         soup = BeautifulSoup(body, features="html.parser")
                         for a in soup.findAll('a'):
                             a.replaceWithChildren()
-                        return remove_newlines(soup.get_text('\n')), message_id
+                        return remove_newlines(soup.get_text()), details
             else:
                 content_type = msg.get_content_type()
                 try:
@@ -66,12 +71,12 @@ def get_email(imap, idx):
                     return None, None
                 if content_type == 'text/plain':
                     remove_links = re.sub(r'http\S+', '', body)
-                    return remove_newlines(remove_links), message_id
+                    return remove_newlines(remove_links), details
                 elif content_type == 'text/html':
                     soup = BeautifulSoup(body, features="html.parser")
                     for a in soup.findAll('a'):
                         a.replaceWithChildren()
-                    return remove_newlines(soup.get_text('\n')), message_id
+                    return remove_newlines(soup.get_text()), details
 
 
 def login(email, password):
@@ -116,10 +121,14 @@ def main():
     model = load_model('spam_filter_001.joblib')
 
     email_matrix = list()
+    email_summaries = list()    # List to return
     for i in range(num_messages, 0, -1):
-        body, message_id = get_email(imap, i)
+        body, details = get_email(imap, i)
         if body is None:
             continue
+        if details[2].date() != datetime.today().date():
+            print(email_summaries)
+            return
         body = re.sub('[^A-Za-z \t\n,.]', '', body)
         word_counts = get_word_counts(body)
         
@@ -129,22 +138,14 @@ def main():
             counts.append(word_counts[word])
         email_matrix.append(counts)
 
-        print('==================================================')
-        print(body)
-        print()
-
         # Prediction
         prediction = model.predict(email_matrix)[0]
-        if prediction == 1:
-            print('SPAM')
-        else:
-            print('NOT SPAM')
-            print('Summary: ')
-            print(get_summary(body))
-
-        response = input('Continue? (y/n) ')
-        if response != 'y':
-            break
+        if prediction == 0:
+            email_summaries.append({
+                'from': details[0],
+                'subject': details[1],
+                'summary': get_summary(body)
+            })
         email_matrix = list()
 
     # Logout of email
