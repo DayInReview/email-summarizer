@@ -1,4 +1,5 @@
 const { app, BrowserWindow, Menu } = require('electron')
+const ipcMain = require('electron').ipcMain;
 const path = require('path')
 const isMac = process.platform === 'darwin';
 const template = [
@@ -130,6 +131,9 @@ function createWindows () {
         }
     });
     win.loadFile(path.join(__dirname, 'DayInReview/templates/home.html'));
+    win.on('closed', () => {
+      win = null;
+    })
 
     login = new BrowserWindow({
         parent: win,
@@ -148,6 +152,9 @@ function createWindows () {
     login.on('close', () => {
       win.show();
     });
+    login.on('closed', () => {
+      login = null;
+    });
 
     // Build Menu
     const mainMenu = Menu.buildFromTemplate(template);
@@ -157,9 +164,21 @@ function createWindows () {
 
     // Open with DevTools. 
     win.webContents.openDevTools() 
+
+    return {
+      main: win,
+      login: login
+    }
 }
 
-app.on('ready', createWindows);
+app.on('ready', () => {
+  const {main, login} = createWindows();
+
+  ipcMain.on('loginInfo', (event, arg) => {
+    // Sends login info to main window
+    main.webContents.send('loginInfo', arg);
+  });
+});
 
 app.on('window-all-closed', () => {
   app.quit();
