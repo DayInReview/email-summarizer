@@ -116,18 +116,38 @@ const template = [
   ]
 
 // Create browser window
-function createWindow () {
+let win
+let login
+function createWindows () {
     process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-    let win = new BrowserWindow({
+    win = new BrowserWindow({
         // Larger for DevTools
         width: 1700,
         height: 800,
+        show: false,
         webPreferences: {
             nodeIntegration: true
         }
     });
+    win.loadFile(path.join(__dirname, 'DayInReview/templates/home.html'));
 
-    win.loadFile(path.join(__dirname, 'DayInReview/templates/login.html'));
+    login = new BrowserWindow({
+        parent: win,
+        width: 1000,
+        height: 800,
+        show: false,
+        // frame: false,
+        webPreferences: {
+          nodeIntegration: true
+        }
+    });
+    login.loadFile(path.join(__dirname, 'DayInReview/templates/login.html'));
+    login.once('ready-to-show', () => {
+      login.show();
+    });
+    login.on('close', () => {
+      win.show();
+    });
 
     // Build Menu
     const mainMenu = Menu.buildFromTemplate(template);
@@ -139,4 +159,8 @@ function createWindow () {
     win.webContents.openDevTools() 
 }
 
-app.on('ready', createWindow);
+app.on('ready', createWindows);
+
+app.on('window-all-closed', () => {
+  app.quit();
+});
