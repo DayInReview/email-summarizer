@@ -144,6 +144,8 @@ def main():
             email_summaries.append({
                 'from': details[0],
                 'subject': details[1],
+                'date': str(details[2].date()),
+                'time': str(details[2].time()),
                 'summary': get_summary(body)
             })
         email_matrix = list()

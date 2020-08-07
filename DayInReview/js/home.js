@@ -6,6 +6,7 @@ function getSummaries (email, password) {
                                     '-e', email,
                                     '-p', password]);
 
+    // log everything to console
     summary.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);
     });
@@ -16,6 +17,11 @@ function getSummaries (email, password) {
 
     summary.on('close', (code) => {
         console.log(`child process exited with code: ${code}`);
+    });
+
+    // load to home page
+    summary.stdout.on('data', (data) => {
+        document.getElementById("summary").innerHTML = data;
     });
 }
 
