@@ -123,7 +123,7 @@ function createWindows () {
     process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
     win = new BrowserWindow({
         // Larger for DevTools
-        width: 1700,
+        width: 1400,
         height: 800,
         show: false,
         webPreferences: {

@@ -1,6 +1,6 @@
 *.pyc
 .vscode
-env
+env*
 *.csv
 keras/models/extractive_summarizer.joblib
 tempCodeRunnerFile.py
