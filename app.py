@@ -87,7 +87,10 @@ def get_email(imap, idx):
 
 def login(email, password):
     imap = imaplib.IMAP4_SSL('imap.gmail.com')
-    imap.login(email, password)
+    try:
+        imap.login(email, password)
+    except imaplib.IMAP4.error:
+        exit(1)
     return imap
 
 
