@@ -13,6 +13,10 @@ from datetime import datetime
 from extractive_summarizer import load_model as load_summary_model, get_summary
 
 
+def get_links(email):
+    return [a['href'] for a in email.find_all('a', href=True)]
+
+
 def get_word_list():
     with open('keras/data/spam_filter_emails.csv', 'r') as csvfile:
         csvreader = csv.reader(csvfile)
@@ -57,12 +61,13 @@ def get_email(imap, idx):
                         pass
                     if content_type == 'text/plain':
                         remove_links = re.sub(r'http\S+', '', body)
-                        return remove_newlines(remove_links), details
+                        return remove_newlines(remove_links), details, []
                     elif content_type == 'text/html':
                         soup = BeautifulSoup(body, features="html.parser")
+                        links = get_links(soup)
                         for a in soup.findAll('a'):
                             a.replaceWithChildren()
-                        return remove_newlines(soup.get_text()), details
+                        return remove_newlines(soup.get_text()), details, links
             else:
                 content_type = msg.get_content_type()
                 try:
@@ -71,17 +76,21 @@ def get_email(imap, idx):
                     return None, None
                 if content_type == 'text/plain':
                     remove_links = re.sub(r'http\S+', '', body)
-                    return remove_newlines(remove_links), details
+                    return remove_newlines(remove_links), details, []
                 elif content_type == 'text/html':
                     soup = BeautifulSoup(body, features="html.parser")
+                    links = get_links(soup)
                     for a in soup.findAll('a'):
                         a.replaceWithChildren()
-                    return remove_newlines(soup.get_text()), details
+                    return remove_newlines(soup.get_text()), details, links
 
 
 def login(email, password):
     imap = imaplib.IMAP4_SSL('imap.gmail.com')
-    imap.login(email, password)
+    try:
+        imap.login(email, password)
+    except imaplib.IMAP4.error:
+        exit(1)
     return imap
 
 
@@ -123,12 +132,12 @@ def main():
     email_matrix = list()
     email_summaries = list()    # List to return
     for i in range(num_messages, 0, -1):
-        body, details = get_email(imap, i)
+        body, details, links = get_email(imap, i)
         if body is None:
             continue
         if details[2].date() != datetime.today().date():
             print(email_summaries)
-            return
+            break
         body = re.sub('[^A-Za-z \t\n,.]', '', body)
         word_counts = get_word_counts(body)
         
@@ -146,6 +155,7 @@ def main():
                 "subject": details[1],
                 "date": str((details[2]).strftime("%B %d, %Y")),
                 "time": str((details[2]).strftime("%-I:%M %p")),
+                "links": links,
                 "summary": get_summary(body)
             })
         email_matrix = list()
