@@ -24,7 +24,6 @@ const template = [
         label: 'Debug (Dev-Mode)',
         submenu: [
             { role: 'reload' },
-            { role: 'forcereload' },
             { role: 'toggledevtools' },
             {
                 label: 'GitHub Repository',
@@ -75,8 +74,6 @@ const template = [
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
         { role: 'toggledevtools' },
         { type: 'separator' },
         { role: 'resetzoom' },
@@ -125,6 +122,8 @@ function createWindows () {
         // Larger for DevTools
         width: 1400,
         height: 800,
+        minWidth: 700,
+        minHeight: 500,
         show: false,
         webPreferences: {
             nodeIntegration: true
@@ -139,6 +138,8 @@ function createWindows () {
         parent: win,
         width: 1000,
         height: 800,
+        minWidth: 700,
+        minHeight: 500,
         show: false,
         // frame: false,
         webPreferences: {
