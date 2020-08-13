@@ -20,6 +20,7 @@
   "dependencies": {
     "bootstrap": "^4.5.0",
     "electron": "^9.1.1",
+    "inspirational-quotes": "^1.0.8",
     "nunjucks": "^3.2.2"
   }
 }

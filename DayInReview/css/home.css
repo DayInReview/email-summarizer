@@ -4,7 +4,7 @@ body {
 }
 
 .home-container {
-    height: 100vh;
+    height: 100vmax;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -12,7 +12,7 @@ body {
 }
 
 .home-sidebar {
-    width: 200px;
+    width: 250px;
     height: 100%;
     background-color: #272c35;
     color: white;
@@ -22,7 +22,7 @@ body {
 
 .home-content {
     flex: 4;
-    padding: 10vh;
+    padding: 10vmax;
     color: white;
     background-color: transparent;
     border-color: transparent;

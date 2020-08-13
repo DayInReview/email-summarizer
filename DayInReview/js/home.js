@@ -25,13 +25,13 @@ function getSummaries(email, password) {
         parsed = parsed.replace(/</g, "&lt"); // escape all left angle brackets
         parsed = parsed.replace(/>/g, "&gt"); // escape all right angle brackets
         parsed = parsed.replace(/'/g, "\""); // replace all the single quotes with double quotes
-        parsed = parsed.replace(/\\n/g, "<br>"); // replace all the \n with \\n
+        parsed = parsed.replace(/\\n/g, " "); // replace all the \n with \\n
         
         parsed = JSON.parse(parsed); // convert stdout to JSON object
         parsed = JSON.stringify(parsed); // convert JSON object to string
 
         console.log(parsed); // log summaries to console
-        
+        window.location.href = "home.html";
         localStorage.setItem('emails', parsed); // store JSON string in local storage
         loadHomePage();
     });

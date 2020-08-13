@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Day in Review</title>
+	<link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../css/loading.css" />
+    <script src="../js/home.js"></script>
+</head>
+
+<body>
+    <div class="loading-container">
+        <!-- motivational quotes -->
+        <div>
+            <h2 id="quote"></h2>
+        </div>
+        <a href="home.html">home page</a>
+        <div>
+            <h4 id="author"></h4>
+        </div>
+    
+        <!-- boxes animation -->
+        <div class="boxes">
+            <div class="box">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <div class="box">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <div class="box">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <div class="box">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- quotes generator -->
+    <script>
+        const Quote = require('inspirational-quotes');
+        quote = Quote.getQuote();
+        while(quote.text.length > 70 || quote.author.length > 30 || quote.author == 'Donald Trump') {
+            quote = Quote.getQuote();
+        }
+        document.getElementById("quote").innerHTML = quote.text;
+        document.getElementById("author").innerHTML = '- ' + quote.author;
+    </script>
+</body>
+
+</html>
