@@ -24,9 +24,9 @@ body {
 
 .box input[type="text"],
 .box input[type="password"] {
-    border: 2px solid #41B3A3;
-    outline: #41B3A3;
-    color: #41B3A3;
+    border: 2px solid #1044b3;
+    outline: #1044b3;
+    color: #1044b3;
     background: none;
     display: block;
     margin: 20px auto;
@@ -41,7 +41,11 @@ body {
 
 .box h1 {
     color: black;
-    font-weight: 500
+    font-weight: 500;
+}
+
+.box p {
+    color: black;
 }
 
 .box input[type="text"]:focus,
@@ -54,7 +58,7 @@ body {
 }
 
 .box input[type="submit"] {
-    background: #41B3A3;
+    background: #1044b3;
     display: block;
     margin: 30px auto;
     text-align: center;
@@ -62,17 +66,17 @@ body {
     border-radius: 24px;
     transition: 0.3s;
     cursor: pointer;
-    border: 2px solid #41B3A3;
-    outline: #41B3A3;
+    border: transparent;
+    outline: transparent;
     color: white;
 }
 
 .box input::placeholder {
-    color: #41B3A3;
+    color: #1044b3;
 }
 
 .box input[type="submit"]:hover {
-    background: #41B3A3;
+    background: #1044b3;
     color: white;
     border-radius: 10px
 }

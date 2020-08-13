@@ -151,10 +151,12 @@ def main():
         prediction = model.predict(email_matrix)[0]
         if prediction == 0:
             email_summaries.append({
-                'from': details[0],
-                'subject': details[1],
-                'links': links,
-                'summary': get_summary(body)
+                "from": details[0],
+                "subject": details[1],
+                "date": str((details[2]).strftime("%B %d, %Y")),
+                "time": str((details[2]).strftime("%-I:%M %p")),
+                "links": links,
+                "summary": get_summary(body)
             })
         email_matrix = list()
 

@@ -24,7 +24,6 @@ const template = [
         label: 'Debug (Dev-Mode)',
         submenu: [
             { role: 'reload' },
-            { role: 'forcereload' },
             { role: 'toggledevtools' },
             {
                 label: 'GitHub Repository',
@@ -75,8 +74,6 @@ const template = [
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
         { role: 'toggledevtools' },
         { type: 'separator' },
         { role: 'resetzoom' },
@@ -123,14 +120,16 @@ function createWindows () {
     process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
     win = new BrowserWindow({
         // Larger for DevTools
-        width: 1700,
+        width: 1000,
         height: 800,
+        minWidth: 700,
+        minHeight: 500,
         show: false,
         webPreferences: {
             nodeIntegration: true
         }
     });
-    win.loadFile(path.join(__dirname, 'DayInReview/templates/home.html'));
+    win.loadFile(path.join(__dirname, 'DayInReview/templates/loading.html'));
     win.on('closed', () => {
       win = null;
     })
@@ -139,6 +138,8 @@ function createWindows () {
         parent: win,
         width: 1000,
         height: 800,
+        minWidth: 700,
+        minHeight: 500,
         show: false,
         // frame: false,
         webPreferences: {
