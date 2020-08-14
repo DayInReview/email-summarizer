@@ -150,8 +150,12 @@ def main():
         # Prediction
         prediction = model.predict(email_matrix)[0]
         if prediction == 0:
+            sender = details[0]
+            if '\'' in sender or '\"' in sender:
+                sender = sender.replace('\'', '')
+                sender = sender.replace('\"', '')
             email_summaries.append({
-                "from": details[0],
+                "from": sender,
                 "subject": details[1],
                 "date": str((details[2]).strftime("%B %d, %Y")),
                 "time": str((details[2]).strftime("%-I:%M %p")),

@@ -120,7 +120,7 @@ function createWindows () {
     process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
     win = new BrowserWindow({
         // Larger for DevTools
-        width: 1000,
+        width: 1200,
         height: 800,
         minWidth: 700,
         minHeight: 500,
@@ -164,7 +164,7 @@ function createWindows () {
     Menu.setApplicationMenu(mainMenu);
 
     // Open with DevTools. 
-    win.webContents.openDevTools() 
+    // win.webContents.openDevTools() 
 
     return {
       main: win,

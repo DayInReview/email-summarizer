@@ -4,7 +4,7 @@ body {
 }
 
 .home-container {
-    height: 100vmax;
+    height: 100vh;
     display: flex;
     flex-direction: row;
     align-items: center;
