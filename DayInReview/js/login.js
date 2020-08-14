@@ -7,3 +7,8 @@ function login () {
     ipcRenderer.send('loginInfo', {email: email.value, password: password.value});
     window.close();
 }
+
+function invalidLogin () {
+    document.getElementById("invalid-login").style.visibility = "visible";
+    window.location.href = "login.html";
+}

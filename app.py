@@ -135,7 +135,7 @@ def main():
         body, details, links = get_email(imap, i)
         if body is None:
             continue
-        if details[2].date() != datetime.today().date():
+        if details[2].date() < datetime.today().date():
             print(email_summaries)
             break
         body = re.sub('[^A-Za-z \t\n,.]', '', body)
