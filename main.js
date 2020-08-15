@@ -114,11 +114,11 @@ const template = [
   ]
 
 // Create browser window
-let win
+let main
 let login
 function createWindows () {
     process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-    win = new BrowserWindow({
+    main = new BrowserWindow({
         // Larger for DevTools
         width: 1200,
         height: 800,
@@ -129,13 +129,13 @@ function createWindows () {
             nodeIntegration: true
         }
     });
-    win.loadFile(path.join(__dirname, 'DayInReview/templates/loading.html'));
-    win.on('closed', () => {
-      win = null;
+    main.loadFile(path.join(__dirname, 'DayInReview/templates/loading.html'));
+    main.on('closed', () => {
+      main = null;
     })
 
     login = new BrowserWindow({
-        parent: win,
+        parent: main,
         width: 1000,
         height: 800,
         minWidth: 700,
@@ -151,7 +151,7 @@ function createWindows () {
       login.show();
     });
     login.on('close', () => {
-      win.show();
+      main.show();
     });
     login.on('closed', () => {
       login = null;
@@ -164,16 +164,16 @@ function createWindows () {
     Menu.setApplicationMenu(mainMenu);
 
     // Open with DevTools. 
-    // win.webContents.openDevTools() 
+    // main.webContents.openDevTools() 
 
     return {
-      main: win,
+      main: main,
       login: login
     }
 }
 
 app.on('ready', () => {
-  const {main, login} = createWindows();
+  const { main } = createWindows();
 
   ipcMain.on('loginInfo', (event, arg) => {
     // Sends login info to main window
