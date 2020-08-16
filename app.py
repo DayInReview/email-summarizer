@@ -34,8 +34,8 @@ def load_model(model_name):
     return joblib.load(f'keras/models/{model_name}')
 
 
-def get_email(imap, idx):
-    res, message = imap.fetch(str(idx), "(RFC822)")
+def get_email(imap, uid):
+    res, message = imap.uid('fetch', str(uid), '(RFC822)')
     for response in message:
         if isinstance(response, tuple):
             msg = email.message_from_bytes(response[1])
@@ -118,17 +118,20 @@ def main():
     imap = login(args.email, args.password)
 
     # Loop through emails
-    status, messages = imap.select("INBOX")
-    num_messages = int(messages[0])
+    imap.select("INBOX")
+    status, messages = imap.uid('search', 'X-GM-RAW "category:primary"')
+    messages = [int(m) for m in messages[0].decode().split()]
+    messages.reverse()
+    num_messages = len(messages)
     if (num_messages == 0):
         exit(2)
 
     # Load model
-    model = load_model('spam_filter_001.joblib')
+    # model = load_model('spam_filter_001.joblib')
 
     email_matrix = list()
     email_summaries = list()    # List to return
-    for i in range(num_messages, 0, -1):
+    for i in messages:
         body, details, links = get_email(imap, i)
         if body is None:
             continue
@@ -143,23 +146,23 @@ def main():
             counts.append(word_counts[word])
         email_matrix.append(counts)
 
-        # Prediction
-        prediction = model.predict(email_matrix)[0]
-        if prediction == 0:
-            sender = details[0]
-            if '\'' in sender or '\"' in sender:
-                sender = sender.replace('\'', '')
-                sender = sender.replace('\"', '')
-            email_summary = get_summary(body)
-            if email_summary is not "":
-                email_summaries.append({
-                    "from": sender,
-                    "subject": details[1],
-                    "date": str((details[2]).strftime("%B %d, %Y")),
-                    "time": str((details[2]).strftime("%-I:%M %p")),
-                    "links": json.dumps(dict((str(i), val) for (i, val) in enumerate(links))),
-                    "summary": email_summary
-                })
+        # # Prediction
+        # prediction = model.predict(email_matrix)[0]
+        # if prediction == 0:
+        sender = details[0]
+        if '\'' in sender or '\"' in sender:
+            sender = sender.replace('\'', '')
+            sender = sender.replace('\"', '')
+        email_summary = get_summary(body)
+        if email_summary is not "":
+            email_summaries.append({
+                "from": sender,
+                "subject": details[1],
+                "date": str((details[2]).strftime("%B %d, %Y")),
+                "time": str((details[2]).strftime("%-I:%M %p")),
+                "links": json.dumps(dict((str(i), val) for (i, val) in enumerate(links))),
+                "summary": email_summary
+            })
         email_matrix = list()
 
     # Logout of email
