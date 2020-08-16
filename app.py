@@ -126,6 +126,8 @@ def main():
     # Loop through emails
     status, messages = imap.select("INBOX")
     num_messages = int(messages[0])
+    if (num_messages == 0):
+        exit(2)
 
     # Load model
     model = load_model('spam_filter_001.joblib')

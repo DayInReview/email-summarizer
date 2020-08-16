@@ -27,3 +27,20 @@ body {
     background-color: transparent;
     border-color: transparent;
 }
+
+.sidebar-table {
+    color: white;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    background-color: #323944;
+    color: white;
+  }
+  
+.table-highlight { 
+    background-color: #323944; 
+}
+
+td {
+    cursor: pointer;
+}

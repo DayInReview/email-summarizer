@@ -1,11 +1,10 @@
 const { exec } = require('child_process');
 const ipcRenderer = require('electron').ipcRenderer;
-const nunjucks = require('nunjucks');
-nunjucks.configure({ autoescape: true });
 
 // loads content when the page is refreshed
 window.onload = function() {
-    loadHomePage();
+    loadHomePage(0);
+    addRowHandlers();
 }
 
 ipcRenderer.on('loginInfo', (event, arg) => {
@@ -25,23 +24,33 @@ function getSummaries(email, password) {
         
         parsed = JSON.parse(parsed); // convert stdout to JSON object
         parsed = JSON.stringify(parsed); // convert JSON object to string
+      
+        // invalid login
+        if (error.status == 1) {
+            window.location.href = "login.html";
+        }
+
+        // no emails in inbox
+        if (error.status == 2) {
+            console.log("No emails in inbox");
+            // window.location.href = "home.html"
+            // document.getElementById("no-emails").style.visibility = "visible";
+            // document.getElementById("sidebar-table").style.visibility = "hidden";
+        }
 
         console.log(parsed); // log summaries to console
         window.location.href = "home.html";
         localStorage.setItem('emails', parsed); // store JSON string in local storage
-        loadHomePage();
-    }).on('exit', (code) => {
-        console.log(`child process exited with code: ${code}`);
     });
 }
 
-function loadHomePage() {
+function loadHomePage(current_email) {
     var all_emails = Object.values(JSON.parse(localStorage.getItem('emails')));
     console.log(all_emails);
-    console.log(all_emails.length);
-    document.getElementById("from").innerHTML = all_emails[0]['from'];
-    document.getElementById("subject").innerHTML = all_emails[0]['subject'];
-    document.getElementById("date").innerHTML = all_emails[0]['date'];
-    document.getElementById("time").innerHTML = all_emails[0]['time'];
-    document.getElementById("summary").innerHTML = all_emails[0]['summary'];
+
+    document.getElementById("from").innerHTML = all_emails[current_email]['from'];
+    document.getElementById("subject").innerHTML = all_emails[current_email]['subject'];
+    document.getElementById("date").innerHTML = all_emails[current_email]['date'];
+    document.getElementById("time").innerHTML = all_emails[current_email]['time'];
+    document.getElementById("summary").innerHTML = all_emails[current_email]['summary'];
 }
