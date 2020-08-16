@@ -6,6 +6,7 @@ import email
 import email.utils
 import re
 import joblib
+import json
 from bs4 import BeautifulSoup
 from email.header import decode_header
 from collections import Counter
@@ -56,9 +57,9 @@ def get_email(imap, idx):
                     content_type = part.get_content_type()
                     content_disposition = str(part.get("Content-Disposition"))
                     try:
-                        body = part.get_payload(decode=True).decode()
+                        body = part.get_payload()
                     except:
-                        pass
+                        return None, None, None
                     if content_type == 'text/plain':
                         remove_links = re.sub(r'http\S+', '', body)
                         return remove_newlines(remove_links), details, []
@@ -71,9 +72,9 @@ def get_email(imap, idx):
             else:
                 content_type = msg.get_content_type()
                 try:
-                    body = msg.get_payload(decode=True).decode()
+                    body = msg.get_payload()
                 except:
-                    return None, None
+                    return None, None, None
                 if content_type == 'text/plain':
                     remove_links = re.sub(r'http\S+', '', body)
                     return remove_newlines(remove_links), details, []
@@ -89,7 +90,7 @@ def login(email, password):
     imap = imaplib.IMAP4_SSL('imap.gmail.com')
     try:
         imap.login(email, password)
-    except imaplib.IMAP4.error:
+    except imaplib.IMAP4.error as e:
         exit(1)
     return imap
 
@@ -138,7 +139,7 @@ def main():
         if body is None:
             continue
         if details[2].date() < datetime.today().date():
-            print(email_summaries)
+            print(json.dumps(dict((str(i), val) for (i, val) in enumerate(email_summaries))))
             break
         body = re.sub('[^A-Za-z \t\n,.]', '', body)
         word_counts = get_word_counts(body)
@@ -161,7 +162,7 @@ def main():
                 "subject": details[1],
                 "date": str((details[2]).strftime("%B %d, %Y")),
                 "time": str((details[2]).strftime("%-I:%M %p")),
-                "links": links,
+                "links": json.dumps(dict((str(i), val) for (i, val) in enumerate(links))),
                 "summary": get_summary(body)
             })
         email_matrix = list()
