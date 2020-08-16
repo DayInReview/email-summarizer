@@ -1,94 +1,71 @@
 import re
-import string
-import joblib
+import quopri
 
-import nltk
-from nltk.tokenize import word_tokenize
-from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
-from nltk.stem import PorterStemmer
-from nltk.stem import WordNetLemmatizer
-
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
-import numpy as np
-
-nltk.download('punkt')
-nltk.download('wordnet')
-
-stemmer = PorterStemmer()
-lemmatizer = WordNetLemmatizer()
-
-### Word Cleaning ###
-
-def remove_stop_words(words):
-    return [i for i in words if i not in ENGLISH_STOP_WORDS]
+def remove_non_words(text):
+    sentences = text.split('\n')
+    final_sentences = list()
+    for sentence in sentences:
+        if sentence == '' or sentence == '.':
+            continue
+        words = sentence.split()
+        final_words = list()
+        for w in words:
+            if re.search(r'[^A-Za-z0-9 \,\.\?\:\n]', w) is None:
+                final_words.append(w)
+        final_sentences.append(' '.join(final_words))
+    return '\n'.join(final_sentences)
 
 
-def word_stemmer(words):
-    return [stemmer.stem(o) for o in words]
-
-
-def word_lemmatizer(words):
-    return [lemmatizer.lemmatize(o) for o in words]
-
-
-def clean_word(text):
-    text = word_tokenize(text)
-    cleaning_utils = [remove_stop_words,
-                      word_stemmer,
-                      word_lemmatizer]
-    for o in cleaning_utils:
-        text = o(text)
+def add_periods(text):
+    def get_replacement_caps(match):
+        return f'.\n{match.group(0)[-1]}'
+    def get_replacement_lower(match):
+        return f' {match.group(0)[-1]}'
+    text = re.sub(r'\n[A-Z0-9]', get_replacement_caps, text)
+    text = re.sub(r'\n[a-z]', get_replacement_lower, text)
+    text = re.sub(r'\ \.', '.', text)
+    text = re.sub(r'\.\ ', '. ', text)
+    text = re.sub(r'\.+', '.', text)
     return text
 
 
-### Sentence Cleaning ###
-
-def remove_hyperlink(word):
-    return re.sub(r"http\S+", "", word)
-
-
-def to_lower(word):
-    return word.lower()
-
-
-def remove_number(word):
-    return re.sub(r'\d+', '', word)
-
-
-def remove_punctuation(word):
-    return word.translate(str.maketrans(dict.fromkeys(string.punctuation)))
-
-
-def remove_whitespace(word):
-    return word.strip()
-
-
-def replace_newline(word):
-    return word.replace('\n','')
-
-
-def clean_sentence(text):
-    cleaning_utils = [remove_hyperlink,
-                      replace_newline,
-                      to_lower,
-                      remove_number,
-                      remove_punctuation,
-                      remove_whitespace]
-    for o in cleaning_utils:
-        text = o(text)
+def remove_whitespace(text):
+    text = text.strip()
+    text = re.sub(r'[\r\n]+', '\n', text)
+    text = re.sub(r'[\n\r]+', '\n', text)
+    text = re.sub(r' +', ' ', text)
+    text = re.sub(r'\n +', '\n', text)
+    text = re.sub(r'\n+', '\n', text)
+    text = re.sub(r'\t+', '', text)
+    text = text.strip()
     return text
 
 
-### Tokenization ###
+def remove_links(text):
+    text = re.sub(r'http\S+', 'HTTPS', text)
+    return text
 
-def tokenize(text):
-    tokenizer = joblib.load('keras/models/tokenizer.tk')
-    text_sequence = np.array(tokenizer.texts_to_sequences([text,]))
-    text_sequence = pad_sequences(text_sequence, maxlen=2000)
+
+def remove_plain_text_special(text):
+    try:
+        text = quopri.decodestring(text).decode('utf-8')
+    except:
+        pass
+    return text
 
 
 def preprocess(text):
-    text = clean_sentence(text)
-    text = clean_word(text)
-    return tokenize(text)
+    text = remove_plain_text_special(text)
+    text = remove_links(text)
+    text = remove_non_words(text)
+    text = remove_whitespace(text)
+    text = add_periods(text)
+    return text
+
+
+if __name__ == '__main__':
+    print(preprocess("""How to use React.js to create a Chrome extension in 5 minutes (https://medi=
+um.com/@chen/how-to-use-react-js-to-create-chrome-extension-in-5-minutes-2d=
+db11899815?source=3Demail-29cc0ffe1e68-1597566465782-digest.reader------1-5=
+9------------------9b0aeec2_3b48_43a6_b9aa_df4c30fdd66f-1-34f218f4_d29d_41a=
+c_b902_4ac6eb4e9162----&sectionName=3Dtop)"""))

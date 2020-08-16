@@ -12,6 +12,7 @@ from email.header import decode_header
 from collections import Counter
 from datetime import datetime
 from extractive_summarizer import load_model as load_summary_model, get_summary
+from preprocessing import preprocess
 
 
 def get_links(email):
@@ -33,22 +34,17 @@ def load_model(model_name):
     return joblib.load(f'keras/models/{model_name}')
 
 
-def remove_newlines(txt):
-    txt = re.sub(r'[\r\n]+', '\n', txt)
-    txt = re.sub(r'[\n\r]+', '\n', txt)
-    txt = re.sub(r' +', ' ', txt)
-    txt = re.sub(r'\n +', '\n', txt)
-    txt = re.sub(r'\n+', '\n', txt)
-    return txt
-
-
 def get_email(imap, idx):
     res, message = imap.fetch(str(idx), "(RFC822)")
     for response in message:
         if isinstance(response, tuple):
             msg = email.message_from_bytes(response[1])
             from_ = msg["From"]
-            subject = msg["Subject"]
+            subject = decode_header(msg["Subject"])[0][0]
+            try:
+                subject = subject.decode('utf-8')
+            except:
+                pass
             date = email.utils.parsedate_to_datetime(msg["Date"])
             details = (from_, subject, date)
 
@@ -61,14 +57,13 @@ def get_email(imap, idx):
                     except:
                         return None, None, None
                     if content_type == 'text/plain':
-                        remove_links = re.sub(r'http\S+', '', body)
-                        return remove_newlines(remove_links), details, []
+                        return preprocess(body), details, []
                     elif content_type == 'text/html':
                         soup = BeautifulSoup(body, features="html.parser")
                         links = get_links(soup)
                         for a in soup.findAll('a'):
                             a.replaceWithChildren()
-                        return remove_newlines(soup.get_text()), details, links
+                        return preprocess(soup.get_text()), details, links
             else:
                 content_type = msg.get_content_type()
                 try:
@@ -76,14 +71,13 @@ def get_email(imap, idx):
                 except:
                     return None, None, None
                 if content_type == 'text/plain':
-                    remove_links = re.sub(r'http\S+', '', body)
-                    return remove_newlines(remove_links), details, []
+                    return preprocess(body), details, []
                 elif content_type == 'text/html':
                     soup = BeautifulSoup(body, features="html.parser")
                     links = get_links(soup)
                     for a in soup.findAll('a'):
                         a.replaceWithChildren()
-                    return remove_newlines(soup.get_text()), details, links
+                    return preprocess(soup.get_text()), details, links
 
 
 def login(email, password):
@@ -141,7 +135,6 @@ def main():
         if details[2].date() < datetime.today().date():
             print(json.dumps(dict((str(i), val) for (i, val) in enumerate(email_summaries))))
             break
-        body = re.sub('[^A-Za-z \t\n,.]', '', body)
         word_counts = get_word_counts(body)
         
         # Add to email_matrix
@@ -157,14 +150,16 @@ def main():
             if '\'' in sender or '\"' in sender:
                 sender = sender.replace('\'', '')
                 sender = sender.replace('\"', '')
-            email_summaries.append({
-                "from": sender,
-                "subject": details[1],
-                "date": str((details[2]).strftime("%B %d, %Y")),
-                "time": str((details[2]).strftime("%-I:%M %p")),
-                "links": json.dumps(dict((str(i), val) for (i, val) in enumerate(links))),
-                "summary": get_summary(body)
-            })
+            email_summary = get_summary(body)
+            if email_summary is not "":
+                email_summaries.append({
+                    "from": sender,
+                    "subject": details[1],
+                    "date": str((details[2]).strftime("%B %d, %Y")),
+                    "time": str((details[2]).strftime("%-I:%M %p")),
+                    "links": json.dumps(dict((str(i), val) for (i, val) in enumerate(links))),
+                    "summary": email_summary
+                })
         email_matrix = list()
 
     # Logout of email
