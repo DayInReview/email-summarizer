@@ -40,7 +40,11 @@ def get_email(imap, idx):
         if isinstance(response, tuple):
             msg = email.message_from_bytes(response[1])
             from_ = msg["From"]
-            subject = msg["Subject"]
+            subject = decode_header(msg["Subject"])[0][0]
+            try:
+                subject = subject.decode('utf-8')
+            except:
+                pass
             date = email.utils.parsedate_to_datetime(msg["Date"])
             details = (from_, subject, date)
 
@@ -129,7 +133,7 @@ def main():
         if body is None:
             continue
         if details[2].date() < datetime.today().date():
-            # print(json.dumps(dict((str(i), val) for (i, val) in enumerate(email_summaries))))
+            print(json.dumps(dict((str(i), val) for (i, val) in enumerate(email_summaries))))
             break
         word_counts = get_word_counts(body)
         

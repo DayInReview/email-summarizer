@@ -16,27 +16,29 @@ function getSummaries(email, password) {
     localStorage.clear();
 
     exec(`python app.py -e ${email} -p ${password}`, (error, stdout, stderr) => {
+        if (error) {
+            // invalid login
+            if (error.code == 1) {
+                console.log("Invalid Login");
+                // window.location.href = "login.html";
+            }
+    
+            // no emails in inbox
+            if (error.code == 2) {
+                console.log("No emails in inbox");
+                // window.location.href = "home.html"
+                // document.getElementById("no-emails").style.visibility = "visible";
+                // document.getElementById("sidebar-table").style.visibility = "hidden";
+            }
+        }
+
         // puts content in correct JSON/HTML format
         parsed = stdout.replace(/</g, "&lt"); // escape all left angle brackets
         parsed = parsed.replace(/>/g, "&gt"); // escape all right angle brackets
         parsed = parsed.replace(/\\n/g, " "); // replace all the newlines with a space
-        console.log(stdout);
-        
+
         parsed = JSON.parse(parsed); // convert stdout to JSON object
         parsed = JSON.stringify(parsed); // convert JSON object to string
-      
-        // invalid login
-        if (error.status == 1) {
-            window.location.href = "login.html";
-        }
-
-        // no emails in inbox
-        if (error.status == 2) {
-            console.log("No emails in inbox");
-            // window.location.href = "home.html"
-            // document.getElementById("no-emails").style.visibility = "visible";
-            // document.getElementById("sidebar-table").style.visibility = "hidden";
-        }
 
         console.log(parsed); // log summaries to console
         window.location.href = "home.html";

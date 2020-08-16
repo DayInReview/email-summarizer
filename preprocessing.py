@@ -60,8 +60,6 @@ def preprocess(text):
     text = remove_non_words(text)
     text = remove_whitespace(text)
     text = add_periods(text)
-    print(text)
-    print("#############################################################")
     return text
 
 
