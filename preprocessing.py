@@ -1,94 +1,62 @@
 import re
-import string
-import joblib
-
-import nltk
-from nltk.tokenize import word_tokenize
-from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
-from nltk.stem import PorterStemmer
-from nltk.stem import WordNetLemmatizer
-
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
-import numpy as np
-
-nltk.download('punkt')
-nltk.download('wordnet')
-
-stemmer = PorterStemmer()
-lemmatizer = WordNetLemmatizer()
-
-### Word Cleaning ###
-
-def remove_stop_words(words):
-    return [i for i in words if i not in ENGLISH_STOP_WORDS]
 
 
-def word_stemmer(words):
-    return [stemmer.stem(o) for o in words]
+def remove_non_words(text):
+    words = text.split()
+    final_words = list()
+    for w in words:
+        if re.search(r'[^A-Za-z0-9 \,\.\?\:]', w) is None:
+            final_words.append(w)
+    return ' '.join(final_words)
 
 
-def word_lemmatizer(words):
-    return [lemmatizer.lemmatize(o) for o in words]
-
-
-def clean_word(text):
-    text = word_tokenize(text)
-    cleaning_utils = [remove_stop_words,
-                      word_stemmer,
-                      word_lemmatizer]
-    for o in cleaning_utils:
-        text = o(text)
+def add_periods(text):
+    text = re.sub(r'\n', '. ', text)
+    text = re.sub(r'\ \.', '.', text)
+    text = re.sub(r'\.+', '.', text)
     return text
 
 
-### Sentence Cleaning ###
-
-def remove_hyperlink(word):
-    return re.sub(r"http\S+", "", word)
-
-
-def to_lower(word):
-    return word.lower()
-
-
-def remove_number(word):
-    return re.sub(r'\d+', '', word)
-
-
-def remove_punctuation(word):
-    return word.translate(str.maketrans(dict.fromkeys(string.punctuation)))
-
-
-def remove_whitespace(word):
-    return word.strip()
-
-
-def replace_newline(word):
-    return word.replace('\n','')
-
-
-def clean_sentence(text):
-    cleaning_utils = [remove_hyperlink,
-                      replace_newline,
-                      to_lower,
-                      remove_number,
-                      remove_punctuation,
-                      remove_whitespace]
-    for o in cleaning_utils:
-        text = o(text)
+def remove_newlines(text):
+    text = re.sub(r'[\r\n]+', '\n', text)
+    text = re.sub(r'[\n\r]+', '\n', text)
+    text = re.sub(r' +', ' ', text)
+    text = re.sub(r'\n +', '\n', text)
+    text = re.sub(r'\n+', '\n', text)
     return text
 
 
-### Tokenization ###
+def remove_links(text):
+    text = re.sub(r'http\S+', '', text)
+    return text
 
-def tokenize(text):
-    tokenizer = joblib.load('keras/models/tokenizer.tk')
-    text_sequence = np.array(tokenizer.texts_to_sequences([text,]))
-    text_sequence = pad_sequences(text_sequence, maxlen=2000)
+
+def remove_plain_text_special(text):
+    text = re.sub(r'=0D', '\n', text)
+    text = re.sub(r'=0A', '\n', text)
+    text = re.sub(r'=\n', '', text)
+    return text
 
 
 def preprocess(text):
-    text = clean_sentence(text)
-    text = clean_word(text)
-    return tokenize(text)
+    print(text)
+    print("#############################################################")
+    text = remove_plain_text_special(text)
+    text = remove_links(text)
+    text = remove_newlines(text)
+    text = add_periods(text)
+    text = remove_non_words(text)
+    print(text)
+    print("#############################################################")
+    return text
+
+
+if __name__ == '__main__':
+    print(preprocess("""=0D=0AYou have a new response=0D=0A=0D=0Aevent: Controls Weekly M=
+eeting F20=0D=0Arespondent: Roie Gal=0D=0A=0D=0AResults so far ..=
+.=0D=0A=0D=0Ahttp://whenisgood.net/yy7p7r5/results/h42tmh2=0D=0A=0D=0A=
+=0D=0A=0D=0A=0D=0A=0D=0ATo stop getting alerts for just this even=
+t, click here ...=0D=0A=0D=0Ahttp://whenisgood.net/NoAlerts?event=
+=3Dyy7p7r5=0D=0A=0D=0A=0D=0AWant to know who is sending you these=
+ emails? =0D=0AManage what you get here: =0D=0Ahttps://youcanbook=
+.me/unsubscribe/?email=3Drishiponnekanti%40gmail.com=0D=0A=0D=0A"""))
