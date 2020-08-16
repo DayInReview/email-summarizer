@@ -19,8 +19,18 @@ function getSummaries(email, password) {
 
     summary.on('close', (code) => {
         console.log(`child process exited with code: ${code}`);
+        
+        // invalid login
         if (code == 1) {
             window.location.href = "login.html";
+        }
+
+        // no emails in inbox
+        if (code == 2) {
+            console.log("No emails in inbox");
+            // window.location.href = "home.html"
+            // document.getElementById("no-emails").style.visibility = "visible";
+            // document.getElementById("sidebar-table").style.visibility = "hidden";
         }
     });
 
@@ -39,14 +49,13 @@ function getSummaries(email, password) {
         console.log(parsed); // log summaries to console
         window.location.href = "home.html";
         localStorage.setItem('emails', parsed); // store JSON string in local storage
-        loadHomePage();
     });
 }
 
 function loadHomePage(current_email) {
     var all_emails = JSON.parse(localStorage.getItem('emails'));
     console.log(all_emails);
-    
+
     document.getElementById("from").innerHTML = all_emails[current_email]['from'];
     document.getElementById("subject").innerHTML = all_emails[current_email]['subject'];
     document.getElementById("date").innerHTML = all_emails[current_email]['date'];
