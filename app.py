@@ -16,7 +16,17 @@ from preprocessing import preprocess
 
 
 def get_links(email):
-    return [a['href'] for a in email.find_all('a', href=True)]
+    links = list()
+    try:
+        links = [a['href'] for a in email.find_all('a', href=True)]
+    except:
+        pass
+    if links == []:
+        try:
+            links = [re.sub(r'[<>]', '', r) for r in re.findall(r'http\S+', email)]
+        except:
+            pass
+    return links
 
 
 def get_word_list():
@@ -57,7 +67,7 @@ def get_email(imap, uid):
                     except:
                         return None, None, None
                     if content_type == 'text/plain':
-                        return preprocess(body), details, []
+                        return preprocess(body), details, get_links(body)
                     elif content_type == 'text/html':
                         soup = BeautifulSoup(body, features="html.parser")
                         links = get_links(soup)
@@ -71,7 +81,7 @@ def get_email(imap, uid):
                 except:
                     return None, None, None
                 if content_type == 'text/plain':
-                    return preprocess(body), details, []
+                    return preprocess(body), details, get_links(body)
                 elif content_type == 'text/html':
                     soup = BeautifulSoup(body, features="html.parser")
                     links = get_links(soup)
