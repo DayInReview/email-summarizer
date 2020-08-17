@@ -129,7 +129,7 @@ def main():
     # Load model
     # model = load_model('spam_filter_001.joblib')
 
-    email_matrix = list()
+    # email_matrix = list()
     email_summaries = list()    # List to return
 
     ct = 0
@@ -138,13 +138,13 @@ def main():
         body, details, links = get_email(imap, i)
         if body is None:
             continue
-        word_counts = get_word_counts(body)
+        # word_counts = get_word_counts(body)
         
-        # Add to email_matrix
-        counts = list()
-        for word in word_list:
-            counts.append(word_counts[word])
-        email_matrix.append(counts)
+        # # Add to email_matrix
+        # counts = list()
+        # for word in word_list:
+        #     counts.append(word_counts[word])
+        # email_matrix.append(counts)
 
         # # Prediction
         # prediction = model.predict(email_matrix)[0]
@@ -163,7 +163,7 @@ def main():
                 "links": json.dumps(dict((str(i), val) for (i, val) in enumerate(links))),
                 "summary": email_summary
             })
-        email_matrix = list()
+        # email_matrix = list()
         
         # check if email is before current day or there are no more emails
         if details[2].date() < datetime.today().date() or ct == num_messages:
