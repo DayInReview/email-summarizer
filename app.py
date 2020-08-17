@@ -131,13 +131,13 @@ def main():
 
     email_matrix = list()
     email_summaries = list()    # List to return
+
+    ct = 0
     for i in messages:
+        ct += 1
         body, details, links = get_email(imap, i)
         if body is None:
             continue
-        if details[2].date() < datetime.today().date():
-            print(json.dumps(dict((str(i), val) for (i, val) in enumerate(email_summaries))))
-            break
         word_counts = get_word_counts(body)
         
         # Add to email_matrix
@@ -154,7 +154,7 @@ def main():
             sender = sender.replace('\'', '')
             sender = sender.replace('\"', '')
         email_summary = get_summary(body)
-        if email_summary is not "":
+        if email_summary != "":
             email_summaries.append({
                 "from": sender,
                 "subject": details[1],
@@ -164,6 +164,11 @@ def main():
                 "summary": email_summary
             })
         email_matrix = list()
+        
+        # check if email is before current day or there are no more emails
+        if details[2].date() < datetime.today().date() or ct == num_messages:
+            print(json.dumps(dict((str(i), val) for (i, val) in enumerate(email_summaries))))
+            break
 
     # Logout of email
     logout(imap)
