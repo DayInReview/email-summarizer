@@ -11,53 +11,58 @@
 
 <body>
 	<div class="home-container">
-		<div class="home-sidebar">
-			<br>
-			<table class="table table-hover sidebar-table" id="sidebar-table" style="visibility: visible;">
-				<tbody>
-					<tr><td>Email 1</td></tr>
-					<tr><td>Email 2</td></tr>
-					<tr><td>Email 3</td></tr>
-				</tbody>
-			</table>
-
+		<div class="email-sidebar">
+			<h2 id="current-day" style="padding: 30px;"></h2>
+			<table class="table table-hover email-table" id="email-table" style="visibility: visible;"></table>
 		</div>
 		<div class="home-content">
-			<h1 id="subject" style="padding-bottom: 10px;"></h1>
-			<h4 id="from"></h4>
-			<h5 id="datetime" style="padding-bottom: 15px;"></h5>
+			<h1 id="subject" style="padding-bottom: 5px;"></h1>
+			<h4 id="from" style="padding-bottom: 15px;"></h4>
 			<hr style="border-top: 1px solid white;">
 			<p id="summary" style="font-size: 20px; padding-top: 15px;"></p>
 			<h1 id="no-emails" style="visibility: hidden;">
 				You have no emails in your inbox!
 			</h1>
 		</div>
+		<div class="links-sidebar" style="padding: 30px;">
+			<h2>Links</h2><br>
+			<table class="table table-hover links-table" id="links-table" style="visibility: visible;"></table>
+		</div>
+		<!-- controls for links -->
+		<div id="nav-body-ctrls"></div>
+		<div id="nav-body-tabs"></div>
+		<div id="nav-body-views"></div>
 	</div>
 	
 	<script>
 		function addRowHandlers() {
-			var table = document.getElementById("sidebar-table");
+			var table = document.getElementById("email-table");
 			var rows = table.getElementsByTagName("tr");
 			for (i = 0; i < rows.length; i++) {
 				var currentRow = table.rows[i];
 				var createClickHandler = function(row) {
 					return function() {
 						loadHomePage(row.rowIndex);
+						populateLinks(row.rowIndex);
 					};
 				};
 				currentRow.onclick = createClickHandler(currentRow);
   			}
 		}
 
-		jQuery(document).ready(function($) {
-			$("#sidebar-table tr:eq(0)").addClass("table-highlight");
-			$("#sidebar-table tr").click(function() {
-				var selected = $(this).hasClass("table-highlight");
-				$("#sidebar-table tr").removeClass("table-highlight");
-				if(!selected)
-					$(this).addClass("table-highlight");
+		function persistentTable() {
+			jQuery(document).ready(function($) {
+				$("#email-table tr:eq(0)").addClass("table-highlight");
+				$("#email-table tr").click(function() {
+					var selected = $(this).hasClass("table-highlight");
+					$("#email-table tr").removeClass("table-highlight");
+					if(!selected)
+						$(this).addClass("table-highlight");
+				});
 			});
-		});
+		}
+
+		const enav = new (require('electron-navigation'))();
 	</script>
 </body>
 
