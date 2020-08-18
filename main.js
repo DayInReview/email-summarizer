@@ -164,7 +164,7 @@ function createWindows () {
     Menu.setApplicationMenu(mainMenu);
 
     // Open with DevTools. 
-    // main.webContents.openDevTools()
+    main.webContents.openDevTools()
 
     return {
       main: main,

@@ -22,7 +22,8 @@ function getSummaries(email, password) {
                 console.log("No emails in inbox");
                 // window.location.href = "home.html"
                 // document.getElementById("no-emails").style.visibility = "visible";
-                // document.getElementById("sidebar-table").style.visibility = "hidden";
+                // document.getElementById("email-table").style.visibility = "hidden";
+                // document.getElementById("links-table").style.visibility = "hidden";
             }
         }
 
