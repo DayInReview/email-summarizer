@@ -7,12 +7,13 @@ import email.utils
 import re
 import joblib
 import json
+import quopri
 from bs4 import BeautifulSoup
 from email.header import decode_header
 from collections import Counter
 from datetime import datetime
 from extractive_summarizer import load_model as load_summary_model, get_summary
-from preprocessing import preprocess
+from preprocessing import preprocess, remove_plain_text_special
 
 
 def get_links(email):
@@ -69,8 +70,12 @@ def get_email(imap, uid):
                     if content_type == 'text/plain':
                         return preprocess(body), details, get_links(body)
                     elif content_type == 'text/html':
-                        soup = BeautifulSoup(body, features="html.parser")
-                        links = get_links(soup)
+                        try:
+                            text = quopri.decodestring(body).decode('utf-8')
+                        except:
+                            text = body
+                        soup = BeautifulSoup(text, features="html.parser")
+                        links = get_links(BeautifulSoup(body, features="html.parser"))
                         for a in soup.findAll('a'):
                             a.replaceWithChildren()
                         return preprocess(soup.get_text()), details, links
@@ -83,8 +88,12 @@ def get_email(imap, uid):
                 if content_type == 'text/plain':
                     return preprocess(body), details, get_links(body)
                 elif content_type == 'text/html':
-                    soup = BeautifulSoup(body, features="html.parser")
-                    links = get_links(soup)
+                    try:
+                        text = quopri.decodestring(body).decode('utf-8')
+                    except:
+                        text = body
+                    soup = BeautifulSoup(text, features="html.parser")
+                    links = get_links(BeautifulSoup(body, features="html.parser"))
                     for a in soup.findAll('a'):
                         a.replaceWithChildren()
                     return preprocess(soup.get_text()), details, links
@@ -94,7 +103,7 @@ def login(email, password):
     imap = imaplib.IMAP4_SSL('imap.gmail.com')
     try:
         imap.login(email, password)
-    except imaplib.IMAP4.error as e:
+    except imaplib.IMAP4.error:
         exit(1)
     return imap
 

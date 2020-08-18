@@ -31,6 +31,7 @@ function getSummaries(email, password) {
         parsed = stdout.replace(/</g, "&lt"); // escape all left angle brackets
         parsed = parsed.replace(/>/g, "&gt"); // escape all right angle brackets
         parsed = parsed.replace(/\\n/g, " "); // replace all the newlines with a space
+        console.log(parsed);
 
         parsed = JSON.parse(parsed); // convert stdout to JSON object
         parsed = JSON.stringify(parsed); // convert JSON object to string

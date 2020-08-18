@@ -23,6 +23,7 @@ def add_periods(text):
         return f' {match.group(0)[-1]}'
     text = re.sub(r'\n[A-Z0-9]', get_replacement_caps, text)
     text = re.sub(r'\n[a-z]', get_replacement_lower, text)
+    text = re.sub(r'\n', '.\n', text)
     text = re.sub(r'\ \.', '.', text)
     text = re.sub(r'\.\ ', '. ', text)
     text = re.sub(r'\.+', '.', text)
@@ -42,7 +43,12 @@ def remove_whitespace(text):
 
 
 def remove_links(text):
-    text = re.sub(r'http\S+', 'HTTPS', text)
+    link_num = 0
+    def replace_link(match):
+        nonlocal link_num
+        link_num += 1
+        return f'[Link {link_num}]'
+    text = re.sub(r'http\S+', replace_link, text)
     return text
 
 
@@ -66,22 +72,37 @@ def separate_words(text):
     def get_replacement(match):
         return f'{match.group(0)[:-1]}. {match.group(0)[-1]}'
     def get_replacement_caps(match):
+        if match.group(0)[-1] == 's':
+            return match.group(0)
         return f'{match.group(0)[:-2]}. {match.group(0)[-2:]}'
-    text = re.sub(r'[a-z][A-Z]', get_replacement, text)
     text = re.sub(r'[0-9][A-Z]', get_replacement, text)
+    text = re.sub(r'[a-z][A-Z]', get_replacement, text)
     text = re.sub(r'[A-Z]{2,}[a-z]', get_replacement_caps, text)
     return text
 
 
+def fix_punctuation(text):
+    def get_replacement_double(match):
+        return f'{match.group(0)[0]}'
+    def get_replacement_sentence(match):
+        return f'{match.group(0)[0]} {match.group(0)[-1]}'
+    text = re.sub(r'[?:,]\.', get_replacement_double, text)
+    text = re.sub(r'[!?:,.][A-Z]', get_replacement_sentence, text)
+    return text
+
+
 def preprocess(text):
+    # print(text)
+    # print("##############################")
     text = remove_plain_text_special(text)
     text = remove_links(text)
     text = remove_non_words(text)
     text = remove_whitespace(text)
     text = add_periods(text)
     text = separate_words(text)
+    text = fix_punctuation(text)
     # print(text)
-    # print("##########################################")
+    # print("##############################")
     return text
 
 
