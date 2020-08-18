@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron')
+const { app, BrowserWindow, Menu, shell } = require('electron')
 const ipcMain = require('electron').ipcMain;
 const path = require('path')
 const isMac = process.platform === 'darwin';
@@ -130,8 +130,17 @@ function createWindows () {
         }
     });
     main.loadFile(path.join(__dirname, 'DayInReview/templates/loading.html'));
-    main.on('closed', () => {
-      main = null;
+	
+	// failed attempt at trying to open links in an external browser
+	// let wc = main.webContents;
+    // wc.on('new-window', function (e, url) {
+	// 	console.log("Opening external link");
+	// 	e.preventDefault();
+	// 	shell.openExternal(url);
+    // })
+	
+	main.on('closed', () => {
+      	main = null;
     })
 
     login = new BrowserWindow({

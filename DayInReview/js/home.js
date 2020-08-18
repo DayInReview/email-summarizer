@@ -4,6 +4,7 @@ window.onload = function() {
     populateLinks(0);
     loadHomePage(0);
     addRowHandlers();
+    persistentTable();
 }
 
 // populate the email sidebar with subjects and times
@@ -30,10 +31,10 @@ function populateLinks(current_email) {
     var table = document.getElementById("links-table");
     table.innerHTML = "";
 
-    for (var i = 0; i < Object.keys(links).length; i++) {
+    for (var i = Object.keys(links).length - 1; i >= 0; i--) {
         var row = table.insertRow(0);
         var cell = row.insertCell(0);
-        cell.innerHTML = links[i];
+        cell.innerHTML = `<a href=${links[i]}>Link ${i + 1}</a>`
     }
 }
 

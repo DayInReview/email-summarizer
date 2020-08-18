@@ -28,6 +28,10 @@
 			<h2>Links</h2><br>
 			<table class="table table-hover links-table" id="links-table" style="visibility: visible;"></table>
 		</div>
+		<!-- controls for links -->
+		<div id="nav-body-ctrls"></div>
+		<div id="nav-body-tabs"></div>
+		<div id="nav-body-views"></div>
 	</div>
 	
 	<script>
@@ -46,15 +50,19 @@
   			}
 		}
 
-		jQuery(document).ready(function($) {
-			$("#email-table tr:eq(0)").addClass("table-highlight");
-			$("#email-table tr").click(function() {
-				var selected = $(this).hasClass("table-highlight");
-				$("#email-table tr").removeClass("table-highlight");
-				if(!selected)
-					$(this).addClass("table-highlight");
+		function persistentTable() {
+			jQuery(document).ready(function($) {
+				$("#email-table tr:eq(0)").addClass("table-highlight");
+				$("#email-table tr").click(function() {
+					var selected = $(this).hasClass("table-highlight");
+					$("#email-table tr").removeClass("table-highlight");
+					if(!selected)
+						$(this).addClass("table-highlight");
+				});
 			});
-		});
+		}
+
+		const enav = new (require('electron-navigation'))();
 	</script>
 </body>
 
