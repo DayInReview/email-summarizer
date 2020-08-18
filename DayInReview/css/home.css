@@ -25,7 +25,8 @@ body {
 .home-content {
     order: 1;
     flex: 4;
-    padding: 10vmax;
+    padding-left: 75px;
+    padding-right: 75px;
     color: white;
     background-color: transparent;
     border-color: transparent;

@@ -176,8 +176,7 @@ def main():
         # email_matrix = list()
         
         # check if email is before current day or there are no more emails
-        # if details[2].date() < datetime.today().date() or ct == num_messages:
-        if ct == num_messages:
+        if details[2].date() < datetime.today().date() or ct == num_messages:
             print(json.dumps(dict((str(i), val) for (i, val) in enumerate(email_summaries))))
             break
 
