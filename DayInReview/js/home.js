@@ -1,3 +1,5 @@
+const { shell } = require('electron');
+
 // loads content when the page is refreshed
 window.onload = function() {
     populateEmails();
@@ -27,14 +29,15 @@ function populateEmails() {
 function populateLinks(current_email) {
     var all_emails = Object.values(JSON.parse(localStorage.getItem('emails')));
     var email = all_emails[current_email];
-    var links = JSON.parse(email['links']);
+    var links = Object.values(JSON.parse(email['links']));
     var table = document.getElementById("links-table");
     table.innerHTML = "";
 
     for (var i = Object.keys(links).length - 1; i >= 0; i--) {
         var row = table.insertRow(0);
         var cell = row.insertCell(0);
-        cell.innerHTML = `<a href=${links[i]}>Link ${i + 1}</a>`
+        cell.innerHTML = `<a id='link${i}'>Link ${i + 1}</a>`
+        document.getElementById(`link${i}`).setAttribute('onclick', `shell.openExternal("${links[i]}")`);
     }
 }
 

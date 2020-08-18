@@ -13,7 +13,7 @@ from email.header import decode_header
 from collections import Counter
 from datetime import datetime
 from extractive_summarizer import load_model as load_summary_model, get_summary
-from preprocessing import preprocess, remove_plain_text_special
+from preprocessing import preprocess
 
 
 def get_links(email):
@@ -27,6 +27,8 @@ def get_links(email):
             links = [re.sub(r'[<>]', '', r) for r in re.findall(r'http\S+', email)]
         except:
             pass
+    else:
+        links = []
     return links
 
 
@@ -75,7 +77,7 @@ def get_email(imap, uid):
                         except:
                             text = body
                         soup = BeautifulSoup(text, features="html.parser")
-                        links = get_links(BeautifulSoup(body, features="html.parser"))
+                        links = get_links(BeautifulSoup(text, features="html.parser"))
                         for a in soup.findAll('a'):
                             a.replaceWithChildren()
                         return preprocess(soup.get_text()), details, links
@@ -93,7 +95,7 @@ def get_email(imap, uid):
                     except:
                         text = body
                     soup = BeautifulSoup(text, features="html.parser")
-                    links = get_links(BeautifulSoup(body, features="html.parser"))
+                    links = get_links(BeautifulSoup(text, features="html.parser"))
                     for a in soup.findAll('a'):
                         a.replaceWithChildren()
                     return preprocess(soup.get_text()), details, links
