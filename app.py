@@ -27,9 +27,13 @@ def get_links(email):
             links = [re.sub(r'[<>]', '', r) for r in re.findall(r'http\S+', email)]
         except:
             pass
-    else:
-        links = []
-    return links
+    final_links = list()
+    for link in links:
+        if link[-1] == '.':
+            final_links.append(link[:-1])
+        else:
+            final_links.append(link)
+    return final_links
 
 
 def get_word_list():
