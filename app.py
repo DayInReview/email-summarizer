@@ -190,8 +190,14 @@ def main():
             })
         # email_matrix = list()
         
-        # check if email is before current day or there are no more emails
-        if details[2].date() < datetime.today().date() or ct == num_messages:
+        # if email is before current day, remove from collection and logout
+        if details[2].date() < datetime.today().date():
+            email_summaries.pop()
+            print(json.dumps(dict((str(i), val) for (i, val) in enumerate(email_summaries))))
+            break
+        
+        # if max email count is reached, logout
+        if ct == num_messages:
             print(json.dumps(dict((str(i), val) for (i, val) in enumerate(email_summaries))))
             break
 
