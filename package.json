@@ -19,7 +19,7 @@
   "homepage": "https://github.com/ishan0102/day-in-review#readme",
   "dependencies": {
     "bootstrap": "^4.5.0",
-    "electron": "^9.1.1",
+    "electron": "^9.3.0",
     "inspirational-quotes": "^1.0.8"
   },
   "devDependencies": {}
